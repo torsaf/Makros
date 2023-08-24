@@ -1,0 +1,47 @@
+Sub Кнопка1_Щелчок()
+
+    ' Объявление переменной для хранения данных в виде массива
+    Dim myArray As Variant
+    
+    ' Проверка, был ли текущий файл книги сохранен
+    If ActiveWorkbook.Saved = False Then
+        ActiveWorkbook.Save
+    End If
+    
+    ' Определение последней заполненной строки в первом листе книги
+    lastRow = ThisWorkbook.Worksheets(1).Cells.SpecialCells(xlCellTypeLastCell).Row
+    
+    ' Запись диапазона значений из столбцов A, B и C в массив myArray
+    myArray = ThisWorkbook.Worksheets(1).Range("B2:D" & lastRow)
+    
+    ' Запись диапазона значений из столбцов C и D в массив myArray1
+    myArray1 = ThisWorkbook.Worksheets(1).Range("C2:D" & lastRow)
+    
+    ' Цикл для обхода строк в массиве myArray1
+    For i = 1 To lastRow - 1
+        ' Проверка наличия значения в текущей ячейке myArray1(i, 1)
+        If myArray1(i, 1) <> "" And myArray1(i, 1) <> Empty Then
+            
+            ' Сохранение значения текущей ячейки myArray1(i, 1) в переменной s
+            s = myArray1(i, 1)
+            
+            ' Поиск подстроки "<![CDATA[" в значении s
+            s1 = InStr(s, "<![CDATA[")
+            
+            ' Проверка, начинается ли значение s с "<![CDATA["
+            If s1 = 1 Then
+                ' Выделение первых 10 символов из s в переменную s2
+                s2 = Left(s, 10)
+                ' Выделение оставшейся части значения s после "<![CDATA[" в переменную s3
+                s3 = Mid(s, 11)
+                ' Формирование нового значения и запись его в myArray1(i, 2)
+                myArray1(i, 2) = "" & s2 & myArray(i, 1) & s3
+            End If
+            
+        End If
+    Next i
+    
+    ' Запись значений из массива myArray1 обратно в диапазон C2:D(lastRow)
+    ThisWorkbook.Worksheets(1).Range("C2:D" & lastRow) = myArray1
+
+End Sub

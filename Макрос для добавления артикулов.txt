@@ -1,0 +1,46 @@
+Sub РедактироватьСтолбец()
+    Dim ws As Worksheet
+    Dim lastRow As Long
+    Dim col1Range As Range, col4Range As Range
+    Dim col1Cell As Range, col4Cell As Range
+    Dim searchString As String
+    Dim insertText As String
+
+    ' Укажите здесь номер вашего активного листа (worksheet)
+    Set ws = ActiveSheet
+
+    ' Укажите здесь номер столбца, в котором находится информация для вставки (первый столбец = 1)
+    Dim col1Number As Long
+    col1Number = 1
+
+    ' Укажите здесь номер столбца, который нужно отредактировать (четвертый столбец)
+    Dim col4Number As Long
+    col4Number = 4
+
+    ' Укажите текст, который нужно вставить после "</n>"
+    insertText = "Вставленный текст"
+
+    ' Находим последнюю заполненную строку в 4 столбце
+    lastRow = ws.Cells(ws.Rows.Count, col4Number).End(xlUp).Row
+
+    ' Определяем диапазон для обоих столбцов
+    Set col1Range = ws.Range(ws.Cells(1, col1Number), ws.Cells(lastRow, col1Number))
+    Set col4Range = ws.Range(ws.Cells(1, col4Number), ws.Cells(lastRow, col4Number))
+
+    ' Проходимся по каждой ячейке 4 столбца
+    For Each col4Cell In col4Range
+        ' Находим позицию первого вхождения "</n>"
+        searchString = "</n>"
+        Dim pos As Long
+        pos = InStr(1, col4Cell.Value, searchString, vbTextCompare)
+        
+        ' Если нашли "</n>"
+        If pos > 0 Then
+            ' Получаем содержимое первой ячейки в том же ряду
+            Set col1Cell = col1Range.Cells(col4Cell.Row, 1)
+            
+            ' Добавляем информацию из первого столбца после "</n>"
+            col4Cell.Value = Left(col4Cell.Value, pos + Len(searchString)) & "Артикул: " & col1Cell.Value & "</n>" & Mid(col4Cell.Value, pos + Len(searchString))
+        End If
+    Next col4Cell
+End Sub
